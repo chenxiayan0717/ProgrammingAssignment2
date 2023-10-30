@@ -16,23 +16,23 @@ makeCacheMatrix <- function(m) {
   # Function to get the matrix
   get <- function() m
   
-  # Function to get the cached inverse or compute and cache if not available
-  getInverse <- function() {
-    if (!is.null(inverse)) {
-      message("Getting cached inverse")
-      return(inverse)
-    }
-    
-    message("Computing and caching inverse")
-    inverse <- solve(m)
-    return(inverse)
-  }
+  setInverse <- function(solve) inverse <<- solve()
+  getInverse <- function() inverse
+  
   
   # Return a list of functions
-  list(set = set, get = get, getInverse = getInverse)
+  list(set = set, get = get, setInverse = setInverse, getInverse = getInverse)
 }
 
 # Function to compute the inverse of the special "matrix" and cache it
-cacheSolve <- function(cacheMatrix) {
-  cacheMatrix$getInverse()
+cacheSolve <- function(cacheMatrix,...) {
+  inverse <- cacheMatrix$getInverse()
+  if (!is.null(inverse)) {
+    message("Getting cached inverse")
+    return(inverse)
+  }
+  data <- cacheMatrix$get()
+  inverse <- solve(data,...)
+  cacheMatrix$setInverse(inverse)
+  inverse
 }
